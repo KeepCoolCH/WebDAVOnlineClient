@@ -1,0 +1,1 @@
+<footer>WebDAV Online Client V.1.0 © 2025 by Kevin Tobler - <a href="https://kevintobler.ch" target="_blank">www.kevintobler.ch</a></footer>
