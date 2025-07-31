@@ -217,7 +217,7 @@ HTML;
 </form>
 <div id="upload-container">
 	<input type="hidden" id="uploadPath" value="<?= htmlspecialchars($currentPath ?? '/') ?>">
-	<input type="file" id="fileInput" multiple webkitdirectory directory style="display:none;">
+	<input type="file" id="fileInput" multiple style="display:none;">
 	<div id="dropzone" class="dropzone">📤 Drag & drop files here or click to upload</div>
 </div>
 <script src="js/spinner.js"></script>
