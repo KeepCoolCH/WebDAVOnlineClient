@@ -7,12 +7,16 @@ function webdav_request($method, $url, $user, $pass, $headers = [], $body = null
     $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_USERPWD => "$user:$pass",
-        CURLOPT_CUSTOMREQUEST => $method,
-        CURLOPT_HTTPHEADER => $headers,
+        CURLOPT_USERPWD        => "$user:$pass",
+        CURLOPT_HTTPAUTH       => CURLAUTH_ANY,   // <– wichtig für PHP 8/cURL
+        CURLOPT_CUSTOMREQUEST  => $method,
+        CURLOPT_HTTPHEADER     => $headers,
+        CURLOPT_HEADER         => true,
+        CURLOPT_FOLLOWLOCATION => true,           // Redirects folgen
+        CURLOPT_TIMEOUT        => 15,
+        // SSL: zum Debuggen unsicher, später auf true stellen
         CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_HEADER => true,
-        CURLOPT_TIMEOUT => 10,
+        CURLOPT_SSL_VERIFYHOST => false,
     ]);
 
     if (strtoupper($method) === 'HEAD') {
@@ -25,11 +29,19 @@ function webdav_request($method, $url, $user, $pass, $headers = [], $body = null
 
     $response = curl_exec($ch);
     $info = curl_getinfo($ch);
+
+    if ($response === false) {
+        $error = curl_error($ch);
+        curl_close($ch);
+        return ['status' => 0, 'body' => '', 'error' => $error];
+    }
+
     $headerSize = $info['header_size'];
-    $body = substr($response, $headerSize);
+    $respBody   = substr($response, $headerSize);
+
     curl_close($ch);
 
-    return ['status' => $info['http_code'], 'body' => $body];
+    return ['status' => $info['http_code'], 'body' => $respBody];
 }
 
 function webdav_list($url, $user, $pass, $depth = 1) {
